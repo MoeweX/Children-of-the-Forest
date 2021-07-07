@@ -1,12 +1,12 @@
 // --- Local variables ---
 var hornZones = [getZone(71), getZone(140), getZone(126), getZone(78), getZone(84), getZone(109), getZone(118)];
 var yggdrasilZone = getZone(101);
-var zonesToCapture = 5; // number of zones to capture for victory
+var zonesToCapture = 7; // number of zones to capture for victory
 
 // --- Attack variables
 var zoneAttackThreshold = 3; // starting with this many zones, wolfs begin their attack
 var currentWave = 0;
-var waveSpeed = 180;
+var waveSpeed = 120;
 
 // --- Script code ---
 function init() {
@@ -45,9 +45,9 @@ function removeUnwantedVictories() {
 
 function setObjectives() {
 	for (currentPlayer in state.players) {
-		currentPlayer.objectives.add("racevictory", "The Horns of Managarm are unclaimed!");
-		currentPlayer.objectives.add("matchingvision", "You have to recover five Horns of Managarm to recover peace in the forrest.");
-		currentPlayer.objectives.add("foerespawn", "But be careful! The forrest wants your territory and keeps attacking the player with the most land.");
+		currentPlayer.objectives.add("vision", "You are a boar! You do not fish or hunt; you eat berries and mushrooms or whatever the forrest gives you. You detest everyone who builds houses or towers and prefer the pureness of forrest soil.");
+		currentPlayer.objectives.add("racevictory", "One day, someone scattered your Horns of Managarm across the forrest. You want them back!");
+		currentPlayer.objectives.add("foerespawn", "But be careful! The forrest does not like conquerors and keeps attacking the clan with the most land.");
 		currentPlayer.objectives.add("horns", "Recovered Horns", {showProgressBar:true, visible:true});
 		currentPlayer.objectives.setGoalVal("horns", zonesToCapture);
 	}
