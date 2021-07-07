@@ -1,0 +1,31 @@
+{
+	"unit": {
+		"Villager": {
+			"produce": {
+				"0": {
+					"q": 0.55
+				}
+			}
+		}
+	},
+	"building": {
+		"House": {
+			"props": {
+				"disabledForClans": [
+					{
+						"clan": "Boar"
+					}
+				]
+			}
+		},
+		"WatchTower": {
+			"props": {
+				"disabledForClans": [
+					{
+						"clan": "Boar"
+					}
+				]
+			}
+		}
+	}
+}
