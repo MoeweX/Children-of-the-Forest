@@ -112,16 +112,15 @@ function checkMonsterSpawn() {
 			// spawn attack units
 			var units = yggdrasilZone.addUnit(Unit.WhiteWolf, amount);
 
+			// launch attack
+			launchAttackPlayer(units, playerWithMostZones);
+
 			// add stronger enemies depending on horns
 			if (capturedHorns >= 4) {
 				var normalized = capturedHorns - 3;
 				var amount = min(6, normalized * normalized); // attack with at most 6 units
-				units = units.concat(yggdrasilZone.addUnit(Unit.Valkyrie, amount));
-			}
-
-			// tell each unit to run towards zone of enemy
-			for (unit in units) {
-				unit.moveToZone(playerWithMostZones.zones[0], true);
+				var units = yggdrasilZone.addUnit(Unit.Valkyrie, amount);
+				launchAttackPlayer(units, playerWithMostZones);
 			}
 		}
 	}
