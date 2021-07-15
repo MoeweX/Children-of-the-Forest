@@ -2,6 +2,7 @@
 var hornZones = [getZone(71), getZone(140), getZone(126), getZone(78), getZone(84), getZone(109), getZone(118)];
 var yggdrasilZone = getZone(101);
 var zonesToCapture = 7; // number of zones to capture for victory
+var capturedHorns = 0;
 
 // --- Attack variables
 var zoneAttackThreshold = 3; // starting with this many zones, wolfs begin their attack
@@ -71,9 +72,12 @@ function checkVictoryProgress() {
 			captured = captured + 1;
 		}
 	}
-	state.objectives.setCurrentVal("horns", captured);
+	capturedHorns = captured;
+	for (currentPlayer in state.players) {
+		currentPlayer.objectives.setCurrentVal("horns", captured);
+	}
 	if (captured >= zonesToCapture) {
-		me().customVictory("Congratulations! The forrst is now at pease again.", "You lost");
+		me().customVictory("Congratulations! The forrst is now at peace again.", "You lost");
 	}
 }
 
@@ -110,6 +114,14 @@ function checkMonsterSpawn() {
 
 			// launch attack
 			launchAttackPlayer(units, playerWithMostZones);
+
+			// add stronger enemies depending on horns
+			if (capturedHorns >= 4) {
+				var normalized = capturedHorns - 3;
+				var amount = min(6, normalized * normalized); // attack with at most 6 units
+				var units = yggdrasilZone.addUnit(Unit.Valkyrie, amount);
+				launchAttackPlayer(units, playerWithMostZones);
+			}
 		}
 	}
 }
