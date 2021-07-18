@@ -1,5 +1,5 @@
 // --- Local variables ---
-var hornZones = [getZone(71), getZone(140), getZone(126), getZone(78), getZone(84), getZone(109), getZone(118)];
+var hornZones = [getZone(42), getZone(84), getZone(109), getZone(118), getZone(158), getZone(136), getZone(29)];
 var yggdrasilZone = getZone(101);
 var zonesToCapture = 7; // number of zones to capture for victory
 var capturedHorns = 0;
@@ -8,6 +8,7 @@ var capturedHorns = 0;
 var zoneAttackThreshold = 3; // starting with this many zones, wolfs begin their attack
 var currentWave = 0;
 var waveSpeed = 120;
+var enemyUnits = [];
 
 // --- Script code ---
 function init() {
@@ -51,6 +52,8 @@ function setObjectives() {
 		currentPlayer.objectives.add("foerespawn", "But be careful! The forrest does not like conquerors and keeps attacking the clan with the most land.");
 		currentPlayer.objectives.add("horns", "Recovered Horns", {showProgressBar:true, visible:true});
 		currentPlayer.objectives.setGoalVal("horns", zonesToCapture);
+		// forbid players to colonize Yggdrasil
+		currentPlayer.allowColonize(yggdrasilZone, false);
 	}
 }
 
@@ -85,48 +88,68 @@ function checkVictoryProgress() {
 
 function checkMonsterSpawn() {
 	 if(toInt(state.time / waveSpeed) > currentWave) {
-		 currentWave++;
-		 var playerWithMostZones = me();
+		currentWave++;
 
-		for (player in state.players) {
-			if (playerWithMostZones.zones.length == player.zones.length) {
-				// random whether to switch
-				if (randomInt(2) == 1) { // is exclusive
-					playerWithMostZones = player;
-				}
-			} else if (playerWithMostZones.zones.length <= player.zones.length) {
-				// the currently evaluated player has more zones
-				playerWithMostZones = player;
-			}
-		}
+		var targetPlayer = getPlayerWithMostZones();
 
 		// only attack if minimum zones reached
-		if (playerWithMostZones.zones.length >= zoneAttackThreshold) {
-			// calculate number of wolfes
-			var amount = max(1, playerWithMostZones.zones.length * 2 - 5); // attack with at least one unit
+		if (targetPlayer.zones.length >= zoneAttackThreshold) {
+			updateEnemiesAndSpawnNew(targetPlayer.zones.length);
 
+			// attack player with most zones
 			var args : Array<Dynamic> = [];
-			args.push(playerWithMostZones.name + " has the largest territory, the forrest wants it back!");
+			args.push(targetPlayer.name + " has the largest territory, the forrest wants it back!");
 			invokeAll("notifyMessage", args);
 
-			// spawn attack units
-			var units = yggdrasilZone.addUnit(Unit.WhiteWolf, amount);
-
 			// launch attack
-			launchAttackPlayer(units, playerWithMostZones);
-
-			// add stronger enemies depending on horns
-			if (capturedHorns >= 4) {
-				var normalized = capturedHorns - 3;
-				var amount = min(6, normalized * normalized); // attack with at most 6 units
-				var units = yggdrasilZone.addUnit(Unit.Valkyrie, amount);
-				launchAttackPlayer(units, playerWithMostZones);
-			}
+			launchAttackPlayer(enemyUnits, targetPlayer);
 		}
 	}
 }
 
-// --- player specific functions
+
+function getPlayerWithMostZones() : Player {
+	var playerWithMostZones = me();
+
+	for (player in state.players) {
+		if (playerWithMostZones.zones.length == player.zones.length) {
+			// random whether to switch
+			if (randomInt(2) == 1) { // is exclusive
+				playerWithMostZones = player;
+			}
+		} else if (playerWithMostZones.zones.length <= player.zones.length) {
+			// the currently evaluated player has more zones
+			playerWithMostZones = player;
+		}
+	}
+
+	return playerWithMostZones;
+}
+
+
+function updateEnemiesAndSpawnNew(enemyZones : Int) {
+	// spawn wolfes
+	var amount = max(1, enemyZones * 2 - 5); // attack with at least one unit
+	enemyUnits = enemyUnits.concat(yggdrasilZone.addUnit(Unit.WhiteWolf, amount));
+
+	// spawn valkyries
+	if (capturedHorns >= 4) {
+		var normalized = capturedHorns - 3;
+		var amount = min(6, normalized * normalized); // attack with at most 6 units
+		yggdrasilZone.addUnit(Unit.Valkyrie, amount);
+	}
+
+	// clean enemyUnits array of dead units (we need to do this here, since haxe is to stupid to know the type of unit otherwise)
+	var aliveUnits = [];
+	for (unit in enemyUnits) {
+		if (unit.isRemoved() == false) {
+			aliveUnits.push(unit);
+		}
+	}
+	enemyUnits = aliveUnits;
+}
+
+// --- Player specific functions
 
 function notifyMessage(message: String) {
 	me().genericNotify(message);
