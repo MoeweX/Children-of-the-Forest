@@ -136,7 +136,7 @@ function updateEnemiesAndSpawnNew(enemyZones : Int) {
 	if (capturedHorns >= 4) {
 		var normalized = capturedHorns - 3;
 		var amount = min(6, normalized * normalized); // attack with at most 6 units
-		yggdrasilZone.addUnit(Unit.Valkyrie, amount);
+		enemyUnits = enemyUnits.concat(yggdrasilZone.addUnit(Unit.Valkyrie, amount));
 	}
 
 	// clean enemyUnits array of dead units (we need to do this here, since haxe is to stupid to know the type of unit otherwise)
