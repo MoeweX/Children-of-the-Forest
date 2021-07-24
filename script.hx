@@ -90,7 +90,7 @@ function checkMonsterSpawn() {
 	 if(toInt(state.time / waveSpeed) > currentWave) {
 		currentWave++;
 
-		var targetPlayer = getPlayerWithMostZones();
+		var targetPlayer = getTargetPlayerForAttack();
 
 		// only attack if minimum zones reached
 		if (targetPlayer.zones.length >= zoneAttackThreshold) {
@@ -107,23 +107,24 @@ function checkMonsterSpawn() {
 	}
 }
 
+function getHighestNumberOfZones() : Int {
+	var highestZoneCount = 0;
+	for (currentPlayer in state.players) {
+		highestZoneCount = highestZoneCount > currentPlayer.zones.length ? highestZoneCount : currentPlayer.zones.length;
+	}
+	return highestZoneCount;
+}
 
-function getPlayerWithMostZones() : Player {
-	var playerWithMostZones = me();
-
+function getTargetPlayerForAttack() : Player {
+	var highestZoneCount = getHighestNumberOfZones();
+	var playersWithHighestZoneCount : Array<Player> = [];
 	for (player in state.players) {
-		if (playerWithMostZones.zones.length == player.zones.length) {
-			// random whether to switch
-			if (randomInt(2) == 1) { // is exclusive
-				playerWithMostZones = player;
-			}
-		} else if (playerWithMostZones.zones.length <= player.zones.length) {
-			// the currently evaluated player has more zones
-			playerWithMostZones = player;
+		if(player.zones.length == highestZoneCount) {
+			playersWithHighestZoneCount.push(player);
 		}
 	}
 
-	return playerWithMostZones;
+	return playersWithHighestZoneCount[randomInt(playersWithHighestZoneCount.length - 1)];
 }
 
 
