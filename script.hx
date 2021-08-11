@@ -1,6 +1,7 @@
 // --- Local variables ---
 var hornZones = [getZone(42), getZone(84), getZone(109), getZone(118), getZone(158), getZone(136), getZone(29)];
 var yggdrasilZone = getZone(101);
+var yggdrasilNeighborsIds = [109, 97, 84, 96, 105, 118];
 var zonesToCapture = 7; // number of zones to capture for victory
 var capturedHorns = 0;
 
@@ -9,6 +10,7 @@ var zoneAttackThreshold = 3; // starting with this many zones, wolfs begin their
 var currentWave = 0;
 var waveSpeed = 120;
 var enemyUnits = [];
+var checkYggrdrasilForFoes = -1; // time at which we check if any units are still at Yggdrasil
 
 // --- Script code ---
 function init() {
@@ -30,6 +32,12 @@ function regularUpdate (dt : Float) {
 		checkVictoryProgress();
 		checkMonsterSpawn();
 		updatePlayerZoneCountObjective();
+
+		// if units still at yggdrasil, send units to the neighbors
+		if (toInt(state.time) == checkYggrdrasilForFoes) {
+			launchAttack(yggdrasilZone.units, yggdrasilNeighborsIds, true);
+			checkYggrdrasilForFoes = -1;
+		}
 	}
 }
 
@@ -116,6 +124,8 @@ function checkMonsterSpawn() {
 			// launch attack
 			launchAttackPlayer(enemyUnits, targetPlayer);
 		}
+
+		checkYggrdrasilForFoes = toInt(state.time) + 30;
 	}
 }
 
