@@ -48,9 +48,9 @@ function removeUnwantedVictories() {
 
 function setObjectives() {
 	for (currentPlayer in state.players) {
-		currentPlayer.objectives.add("vision", "You are a boar! You do not fish or hunt; you eat berries and mushrooms or whatever the forrest gives you. You detest everyone who builds houses or towers and prefer the pureness of forrest soil.");
-		currentPlayer.objectives.add("racevictory", "One day, someone scattered your Horns of Managarm across the forrest. You want them back!");
-		currentPlayer.objectives.add("foerespawn", "But be careful! The forrest does not like conquerors and keeps attacking the clan with the most land.");
+		currentPlayer.objectives.add("vision", "You are a boar! You do not fish or hunt; you eat berries and mushrooms or whatever the forest gives you. You detest everyone who builds houses or towers and prefer the pureness of forest soil.");
+		currentPlayer.objectives.add("racevictory", "One day, someone scattered your Horns of Managarm across the forest. You want them back!");
+		currentPlayer.objectives.add("foerespawn", "But be careful! The forest does not like conquerors and keeps attacking the clan with the most land.");
 		currentPlayer.objectives.add("numZones", "Number of zones", {showOtherPlayers:true, showProgressBar: true, visible:true});
 		currentPlayer.objectives.add("horns", "Recovered Horns", {showProgressBar:true, visible:true});
 		currentPlayer.objectives.setGoalVal("horns", zonesToCapture);
@@ -82,7 +82,7 @@ function checkVictoryProgress() {
 		currentPlayer.objectives.setCurrentVal("horns", captured);
 	}
 	if (captured >= zonesToCapture) {
-		me().customVictory("Congratulations! The forrst is now at peace again.", "You lost");
+		me().customVictory("Congratulations! The forest is now at peace again.", "You lost");
 	}
 }
 
@@ -102,7 +102,7 @@ function checkMonsterSpawn() {
 	 if(toInt(state.time / waveSpeed) > currentWave) {
 		currentWave++;
 
-		var targetPlayer = getPlayerWithMostZones();
+		var targetPlayer = getTargetPlayerForAttack();
 
 		// only attack if minimum zones reached
 		if (targetPlayer.zones.length >= zoneAttackThreshold) {
@@ -110,7 +110,7 @@ function checkMonsterSpawn() {
 
 			// attack player with most zones
 			var args : Array<Dynamic> = [];
-			args.push(targetPlayer.name + " has the largest territory, the forrest wants it back!");
+			args.push(targetPlayer.name + " has the largest territory, the forest wants it back!");
 			invokeAll("notifyMessage", args);
 
 			// launch attack
@@ -127,22 +127,16 @@ function getHighestNumberOfZones() : Int {
 	return highestZoneCount;
 }
 
-function getPlayerWithMostZones() : Player {
-	var playerWithMostZones = me();
-
+function getTargetPlayerForAttack() : Player {
+	var highestZoneCount = getHighestNumberOfZones();
+	var playersWithHighestZoneCount : Array<Player> = [];
 	for (player in state.players) {
-		if (playerWithMostZones.zones.length == player.zones.length) {
-			// random whether to switch
-			if (randomInt(2) == 1) { // is exclusive
-				playerWithMostZones = player;
-			}
-		} else if (playerWithMostZones.zones.length <= player.zones.length) {
-			// the currently evaluated player has more zones
-			playerWithMostZones = player;
+		if(player.zones.length == highestZoneCount) {
+			playersWithHighestZoneCount.push(player);
 		}
 	}
 
-	return playerWithMostZones;
+	return playersWithHighestZoneCount[randomInt(playersWithHighestZoneCount.length - 1)];
 }
 
 
