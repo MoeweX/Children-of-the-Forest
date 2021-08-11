@@ -29,6 +29,7 @@ function regularUpdate (dt : Float) {
 	if (isHost()) {
 		checkVictoryProgress();
 		checkMonsterSpawn();
+		updatePlayerZoneCountObjective();
 	}
 }
 
@@ -50,6 +51,7 @@ function setObjectives() {
 		currentPlayer.objectives.add("vision", "You are a boar! You do not fish or hunt; you eat berries and mushrooms or whatever the forest gives you. You detest everyone who builds houses or towers and prefer the pureness of forest soil.");
 		currentPlayer.objectives.add("racevictory", "One day, someone scattered your Horns of Managarm across the forest. You want them back!");
 		currentPlayer.objectives.add("foerespawn", "But be careful! The forest does not like conquerors and keeps attacking the clan with the most land.");
+		currentPlayer.objectives.add("numZones", "Conquered Land", {showOtherPlayers:true, showProgressBar: true, visible:true});
 		currentPlayer.objectives.add("horns", "Recovered Horns", {showProgressBar:true, visible:true});
 		currentPlayer.objectives.setGoalVal("horns", zonesToCapture);
 		// forbid players to colonize Yggdrasil
@@ -81,6 +83,16 @@ function checkVictoryProgress() {
 	}
 	if (captured >= zonesToCapture) {
 		me().customVictory("Congratulations! The forest is now at peace again.", "You lost");
+	}
+}
+
+function updatePlayerZoneCountObjective() {
+	for (player in state.players) {
+		player.objectives.setCurrentVal("numZones", player.zones.length);
+		for (otherPlayer in state.players) {
+			player.objectives.setOtherPlayerVal("numZones", otherPlayer, otherPlayer.zones.length);
+		}
+		player.objectives.setGoalVal("numZones", getHighestNumberOfZones());
 	}
 }
 
