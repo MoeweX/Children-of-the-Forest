@@ -31,7 +31,6 @@ function regularUpdate (dt : Float) {
 	if (isHost()) {
 		checkVictoryProgress();
 		checkMonsterSpawn();
-		updatePlayerZoneCountObjective();
 
 		// if units still at yggdrasil, send units to the neighbors
 		if (toInt(state.time) == checkYggrdrasilForFoes) {
@@ -39,6 +38,7 @@ function regularUpdate (dt : Float) {
 			checkYggrdrasilForFoes = -1;
 		}
 	}
+	updatePlayerZoneCountObjective();
 }
 
 // --- Launch ---
@@ -95,13 +95,11 @@ function checkVictoryProgress() {
 }
 
 function updatePlayerZoneCountObjective() {
-	for (player in state.players) {
-		player.objectives.setCurrentVal("numZones", player.zones.length);
-		for (otherPlayer in state.players) {
-			player.objectives.setOtherPlayerVal("numZones", otherPlayer, otherPlayer.zones.length);
-		}
-		player.objectives.setGoalVal("numZones", getHighestNumberOfZones());
+	me().objectives.setCurrentVal("numZones", me().zones.length);
+	for (otherPlayer in state.players) {
+		me().objectives.setOtherPlayerVal("numZones", otherPlayer, otherPlayer.zones.length);
 	}
+	me().objectives.setGoalVal("numZones", getHighestNumberOfZones());
 }
 
 // --- Other Methods ---
