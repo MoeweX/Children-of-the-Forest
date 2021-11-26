@@ -20,6 +20,7 @@ function init() {
 			setObjectives();
 			revealHorns();
 		}
+		yggdrasilZone.allowScouting = false;
 
 		// for debugging purposes
 		// me().discoverAll();
